@@ -1,13 +1,17 @@
 let notes = [];
 let trashNotes = [];
 
+function init() {
+  getFromLocalStorage();
+  renderNotes();
+}
+
 function renderNotes() {
   let contentRef = document.getElementById("content");
   contentRef.innerHTML = "";
   for (let IndexNote = 0; IndexNote < notes.length; IndexNote++) {
     contentRef.innerHTML += getNoteTemplate(IndexNote);
   }
-  getFromLocalStorage();
 }
 
 function getNoteTemplate(IndexNote) {
