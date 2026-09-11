@@ -7,6 +7,7 @@ function renderNotes() {
   for (let IndexNote = 0; IndexNote < notes.length; IndexNote++) {
     contentRef.innerHTML += getNoteTemplate(IndexNote);
   }
+  getFromLocalStorage();
 }
 
 function getNoteTemplate(IndexNote) {
@@ -21,6 +22,7 @@ function addNote() {
   let noteInputRef = document.getElementById("note_input");
   let noteInput = noteInputRef.value;
   notes.push(noteInput);
+  saveToLocalStorage();
   renderNotes();
   noteInputRef.value = "";
 }
@@ -42,4 +44,13 @@ function renderTrashNotes() {
   ) {
     trashContentRef.innerHTML += getTrashNoteTemplate(IndexTrashNote);
   }
+}
+
+function saveToLocalStorage() {
+  localStorage.setItem("notes", JSON.stringify(notes));
+}
+
+function getFromLocalStorage() {
+  let myArr = JSON.parse(localStorage.getItem("notes"));
+  notes = myArr;
 }
