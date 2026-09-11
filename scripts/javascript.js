@@ -1,60 +1,83 @@
+// GLOBALES
 let notes = [];
 let trashNotes = [];
 
+// BODY ON LOAD
 function init() {
   getFromLocalStorage();
   renderNotes();
+  renderTrashNotes();
 }
 
-function renderNotes() {
-  let contentRef = document.getElementById("content");
-  contentRef.innerHTML = "";
-  for (let IndexNote = 0; IndexNote < notes.length; IndexNote++) {
-    contentRef.innerHTML += getNoteTemplate(IndexNote);
-  }
-}
-
-function getNoteTemplate(IndexNote) {
-  return `    <p>+ ${notes[IndexNote]}<button onclick="deleteNote(${IndexNote})">X</button></p>`;
-}
-
-function getTrashNoteTemplate(IndexTrashNote) {
-  return `    <p>+ ${trashNotes[IndexTrashNote]}<button onclick="deleteTrashNote(${IndexTrashNote})">X</button></p>`;
-}
-
+// FUNKTIONEN
 function addNote() {
   let noteInputRef = document.getElementById("note_input");
-  let noteInput = noteInputRef.value;
+  let noteInput = noteInputRef.value.trim();
+  if (noteInput === "") return;
   notes.push(noteInput);
-  saveToLocalStorage();
+  saveAll();
   renderNotes();
   noteInputRef.value = "";
 }
 
 function deleteNote(indexNote) {
-  let trashNote = notes.splice(indexNote, 1);
-  trashNotes.push(trashNote);
+  let deletedNote = notes.splice(indexNote, 1);
+  trashNotes.push(deletedNote[0]);
+  saveAll();
   renderNotes();
   renderTrashNotes();
+}
+
+function deleteTrashNote(indexTrashNote) {
+  trashNotes.splice(indexTrashNote, 1);
+  saveAll();
+  renderTrashNotes();
+}
+
+function renderNotes() {
+  let contentRef = document.getElementById("content");
+  contentRef.innerHTML = "";
+  for (let indexNote = 0; indexNote < notes.length; indexNote++) {
+    contentRef.innerHTML += getNoteTemplate(indexNote);
+  }
 }
 
 function renderTrashNotes() {
   let trashContentRef = document.getElementById("trash_content");
   trashContentRef.innerHTML = "";
   for (
-    let IndexTrashNote = 0;
-    IndexTrashNote < trashNotes.length;
-    IndexTrashNote++
+    let indexTrashNote = 0;
+    indexTrashNote < trashNotes.length;
+    indexTrashNote++
   ) {
-    trashContentRef.innerHTML += getTrashNoteTemplate(IndexTrashNote);
+    trashContentRef.innerHTML += getTrashNoteTemplate(indexTrashNote);
   }
 }
 
-function saveToLocalStorage() {
-  localStorage.setItem("notes", JSON.stringify(notes));
+//TEMPLATES
+function getNoteTemplate(indexNote) {
+  return `<p>+ ${notes[indexNote]}<button onclick="deleteNote(${indexNote})">X</button></p>`;
+}
+
+function getTrashNoteTemplate(indexTrashNote) {
+  return `<p>+ ${trashNotes[indexTrashNote]}<button onclick="deleteTrashNote(${indexTrashNote})">X</button></p>`;
+}
+
+//LOCAL STORAGE
+function saveAll() {
+  saveTo("notes", notes);
+  saveTo("trashNotes", trashNotes);
+}
+
+function saveTo(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
 }
 
 function getFromLocalStorage() {
-  let myArr = JSON.parse(localStorage.getItem("notes"));
-  notes = myArr;
+  notes = getFrom("notes");
+  trashNotes = getFrom("trashNotes");
+}
+
+function getFrom(key) {
+  return JSON.parse(localStorage.getItem(key)) || [];
 }
